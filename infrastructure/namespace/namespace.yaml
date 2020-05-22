@@ -1,0 +1,27 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: The private hosted service discovery namespace which binds to the input VPC stack
+
+Parameters:
+  EnvironmentName:
+    Description: An environment name that will be prefixed to resource names
+    Type: String
+
+  ECSServicesDomain:
+    Type: String
+    Description: "Domain name registered under Route-53 that will be used for Service Discovery"
+
+Resources:
+  ECSServiceDiscoveryNamespace:
+    Type: AWS::ServiceDiscovery::PrivateDnsNamespace
+    Properties:
+      Vpc:
+        'Fn::ImportValue': !Sub "${EnvironmentName}:VPC"
+      Name: { Ref: ECSServicesDomain }
+
+Outputs:
+  ECSServiceDiscoveryNamespace:
+    Description: A SDS namespace that will be used by all services in this cluster
+    Value: !Ref ECSServiceDiscoveryNamespace
+    Export:
+      Name: !Sub "${EnvironmentName}:ECSServiceDiscoveryNamespace"
+    
